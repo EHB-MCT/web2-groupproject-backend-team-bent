@@ -15,7 +15,7 @@ async function run() {
         console.log("Connected correctly to server");
         const db = client.db(dbName);
 
-        // Use the collection ""
+        // Use the collection "challenges"
         const col = db.collection("challenges");
 
         // Construct a document                                                                                                                                                              
