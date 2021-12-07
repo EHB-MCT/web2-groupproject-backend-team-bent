@@ -1,8 +1,10 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const { MongoClient, ObjectId } = require('mongodb');
-require('dotenv').config();
-const cors = require('cors');
+const express = require("express");
+const bodyParser = require("body-parser");
+const { MongoClient } = require("mongodb");
+const ObjectId = require("mongodb").ObjectId;
+// Had to make a path import because for some reason vsc didn't recognize my .env file
+const path = require("path");
+require("dotenv").config({ path: path.resolve(".env") });
 
 console.log(process.env.TEST);
 
