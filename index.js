@@ -4,145 +4,196 @@ const { MongoClient, ObjectId } = require('mongodb');
 require('dotenv').config();
 const cors = require('cors');
 
-//Create the mongo client to use
+console.log(process.env.TEST);
+
 const client = new MongoClient(process.env.MONGO_URL);
 
 const app = express();
-//Let heroku do its thing with the port
-const port = process.env.PORT || 1337;
+const port = process.env.PORT;
 
-app.use(express.static('public'));
+app.use(express.static("public"));
 app.use(bodyParser.json());
-// Floodgates OPEN!
-app.use(cors());
 
-
-//Root route
-app.get('/', (req, res) => {
-    res.status(300).redirect('/info.html');
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
 });
 
-// DONE - Return all challenges from the database
-app.get('/challenges', async (req, res) =>{
-
-    try{
-         //connect to the db
-        await client.connect();
-
-         //retrieve the challenges collection data
-        const colli = client.db('dataBASED').collection('challenges');
-        const chs = await colli.find({}).toArray();
-
-         //Send back the data with the response
-        res.status(200).send(chs);
-    }catch(error){
-        console.log(error)
-        res.status(500).send({
-            error: 'Something went wrong',
-            value: error
-        });
-    }finally {
-        await client.close();
-    }
-
-    
+// Root route
+app.get("/", (req, res) => {
+    res.status(300).redirect("/info.html");
 });
 
-// DONE - challenges/:id
-app.get('/challenges/:id', async (req,res) => {
-    //id is located in the query: req.params.id
-    try{
-         //connect to the db
+// Return all challenges
+app.get("/challenges", async (req, res) => {
+    try {
+        // Connect to the database
         await client.connect();
 
-         //retrieve the boardgame collection data
-        const colli = client.db('dataBASED').collection('challenges');
+        // Retrieve the challenges collection data
+        const col = client.db("dataBASED").collection("challenges");
+        const chals = await col.find({}).toArray();
 
-         //only look for a challenge with this ID
-        const query = { _id: ObjectId(req.params.id) };
-
-        const challenge = await colli.findOne(query);
-
-        if(challenge){
-             //Send back the file
-            res.status(200).send(challenge);
-            return;
-        }else{
-            res.status(400).send('Challenge could not be found with id: ' + req.params.id);
-        }
-      
-    }catch(error){
+        // Send back the file
+        res.status(200).send(chals);
+    } catch (error) {
         console.log(error);
         res.status(500).send({
-            error: 'Something went wrong',
-            value: error
+            error: "something went wrong",
+            value: error,
         });
-    }finally {
+    } finally {
         await client.close();
     }
 });
 
-// save a challenge
-app.post('/challenges', async (req, res) => {
-
-    if(!req.body.name || !req.body.course || !req.body.points){
-        res.status(400).send('Bad request: missing name, course or points');
-        return;
-    }
-
-    try{
-         //connect to the db
+// Return a single challenge
+app.get("/challenge/:id", async (req, res) => {
+    // id is located in the query: req.query.id
+    try {
+        // Connect to the database
         await client.connect();
 
-         //retrieve the challenges collection data
-        const colli = client.db('dataBASED').collection('challenges');
+        // Retrieve the challenges collection data
+        const col = client.db("dataBASED").collection("challenges");
 
-         // Validation for double challenges
-        const bg = await colli.findOne({name: req.body.name, course: req.body.course});
-        if(bg){
-            res.status(400).send(`Bad request: Challenge already exists with name ${req.body.name} for course ${req.body.course}` );
+        // Force the req.query.id into an ObjectId otherwise you won't be able to log anything.
+        // Important: Make sure to import ObjectId as `const ObjectId = require("mongodb").ObjectId`
+        const query = { _id: ObjectId(req.query.id) };
+        const chal = await col.findOne(query);
+
+        if (chal) {
+            // Send back the file
+            res.status(200).send(chal);
             return;
-        } 
-         // Create the new Challenge object
-        let newChallenge = {
+        } else {
+            res.status(400).send(`Challenge with id \"${req.query.id}\" could not be found`);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: "Data could not be read... try again later!",
+            value: error,
+        });
+    } finally {
+        await client.close();
+    }
+});
+
+// Save a challenge
+app.post("/challenge", async (req, res) => {
+    // Validation
+    if (!req.body.name || !req.body.points || !req.body.session || !req.body.course) {
+        res.status(400).send("Bad request: Missing name, points, session or course");
+        return;
+    }
+    try {
+        // Connect to the database
+        await client.connect();
+
+        // Retrieve the challenges collection data
+        const col = client.db("dataBASED").collection("challenges");
+
+        // Validation for double challenges
+        // const chal = await col.findOne({ name: req.body.name, points: req.body.points, session: req.body.session, course: req.body.course });
+        // if (chal) {
+        //     res.status(400).send(`Challenge with name \"${req.body.name}\" already exists`);
+        //     return;
+        // }
+
+        // Create the new challenge object
+        let newChal = {
             name: req.body.name,
-            course: req.body.course,
             points: req.body.points,
-        }
-        // Add the optional session field
-        if(req.body.session){
-            newChallenge.session = req.body.session;
-        }
-        
-         // Insert into the database
-        let insertResult = await colli.insertOne(newChallenge);
+            session: req.body.session,
+            course: req.body.course,
+        };
 
-         //Send back successmessage
-        res.status(201).json(newChallenge);
+        // Insert into the database
+        let insertResult = await col.insertOne(newChal);
+
+        // Send back success message
+        res.status(201).send(`Challenge with name \"${req.body.name}\" successfully saved.`);
         return;
-    }catch(error){
+    } catch (error) {
+        res.status(500).send({
+            error: "Something went wrong...",
+            value: error,
+        });
+    }
+});
+
+// Update a challenge
+app.put("/challenges/:id", async (req, res) => {
+    try {
+        // Connect to the database
+        await client.connect();
+
+        // Retrieve the challenges collection data
+        const col = client.db("dataBASED").collection("challenges");
+
+        // Create a query for a challenge to update
+        const query = { _id: ObjectId(req.query.id) };
+
+        // This option instructs the method to create a document if no documents match the filter
+        const options = { upsert: true };
+
+        // Create a document that sets the plot of the movie
+        const updateChal = {
+            $set: {
+                name: req.body.name,
+                points: req.body.points,
+                session: req.body.session,
+                course: req.body.course,
+            },
+        };
+
+        // Updating the challenge
+        const result = await col.updateOne(query, updateChal, options);
+
+        // Send back success message
+        res.status(201).send(`Challenge with id "${req.query.id}" successfully updated.`);
+    } catch (error) {
         console.log(error);
         res.status(500).send({
-            error: 'Something went wrong',
-            value: error
+            error: "something went wrong",
+            value: error,
         });
-    }finally {
+    } finally {
         await client.close();
     }
 });
 
-//update a challenge
-app.put('/challenges/:id', async (req,res) => {
-    res.send('UPDATE OK');
+// Deleting a challenge
+app.delete("/challenges/:id", async (req, res) => {
+    try {
+        // Connect to the database
+        await client.connect();
+
+        // Retrieve the challenges collection data
+        const col = client.db("dataBASED").collection("challenges");
+
+        // Create a query for a challenge to delete
+        const query = { _id: ObjectId(req.query.id) };
+
+        // Deleting the challenge
+        const result = await col.deleteOne(query);
+        if (result.deletedCount === 1) {
+            res.status(200).send(`Challenge with id "${req.query.id}" successfully deleted.`);
+        } else {
+            res.status(404).send("No documents matched the query. Deleted 0 documents.");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: "something went wrong",
+            value: error,
+        });
+    } finally {
+        await client.close();
+    }
 });
-
-//delete a challenge
-app.delete('/challenges/:id', async (req,res) => {
-    res.send('DELETE OK');
-});
-
-
 
 app.listen(port, () => {
     console.log(`API is running at http://localhost:${port}`);
-})
+});
