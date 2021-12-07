@@ -30,7 +30,7 @@ app.get('/challenges', async (req, res) =>{
         await client.connect();
 
          //retrieve the challenges collection data
-        const colli = client.db('groupproject').collection('challenges');
+        const colli = client.db('dataBASED').collection('challenges');
         const chs = await colli.find({}).toArray();
 
          //Send back the data with the response
@@ -56,7 +56,7 @@ app.get('/challenges/:id', async (req,res) => {
         await client.connect();
 
          //retrieve the boardgame collection data
-        const colli = client.db('groupproject').collection('challenges');
+        const colli = client.db('dataBASED').collection('challenges');
 
          //only look for a challenge with this ID
         const query = { _id: ObjectId(req.params.id) };
@@ -95,7 +95,7 @@ app.post('/challenges', async (req, res) => {
         await client.connect();
 
          //retrieve the challenges collection data
-        const colli = client.db('groupproject').collection('challenges');
+        const colli = client.db('dataBASED').collection('challenges');
 
          // Validation for double challenges
         const bg = await colli.findOne({name: req.body.name, course: req.body.course});
