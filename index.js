@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { MongoClient } = require("mongodb");
-const ObjectId = require("mongodb").ObjectId;
+const { MongoClient, ObjectId } = require("mongodb");
+
 // Had to make a path import because for some reason vsc didn't recognize my .env file
 const path = require("path");
 require("dotenv").config({ path: path.resolve(".env") });
@@ -135,7 +135,7 @@ app.put("/challenges/:id", async (req, res) => {
         const col = client.db("dataBASED").collection("challenges");
 
         // Create a query for a challenge to update
-        const query = { _id: ObjectId(req.query.id) };
+        const query = { _id: ObjectId(req.params.id) };
 
         // This option instructs the method to create a document if no documents match the filter
         const options = { upsert: true };
@@ -151,10 +151,10 @@ app.put("/challenges/:id", async (req, res) => {
         };
 
         // Updating the challenge
-        const result = await col.updateOne(query, updateChal, options);
+        const result = await col.updateOne(params, updateChal, options);
 
         // Send back success message
-        res.status(201).send(`Challenge with id "${req.query.id}" successfully updated.`);
+        res.status(201).send(`Challenge with id "${req.params.id}" successfully updated.`);
     } catch (error) {
         console.log(error);
         res.status(500).send({
@@ -176,12 +176,12 @@ app.delete("/challenges/:id", async (req, res) => {
         const col = client.db("dataBASED").collection("challenges");
 
         // Create a query for a challenge to delete
-        const query = { _id: ObjectId(req.query.id) };
+        const query = { _id: ObjectId(req.params.id) };
 
         // Deleting the challenge
         const result = await col.deleteOne(query);
         if (result.deletedCount === 1) {
-            res.status(200).send(`Challenge with id "${req.query.id}" successfully deleted.`);
+            res.status(200).send(`Challenge with id "${req.params.id}" successfully deleted.`);
         } else {
             res.status(404).send("No documents matched the query. Deleted 0 documents.");
         }
