@@ -31,7 +31,7 @@ app.get("/challenges", async (req, res) => {
         await client.connect();
 
         // Retrieve the challenges collection data
-        const col = client.db("ArnoStephanSacha").collection("challenges");
+        const col = client.db("dataBASED").collection("challenges");
         const chals = await col.find({}).toArray();
 
         // Send back the file
@@ -55,7 +55,7 @@ app.get("/challenge/:id", async (req, res) => {
         await client.connect();
 
         // Retrieve the challenges collection data
-        const col = client.db("ArnoStephanSacha").collection("challenges");
+        const col = client.db("dataBASED").collection("challenges");
 
         // Force the req.query.id into an ObjectId otherwise you won't be able to log anything.
         // Important: Make sure to import ObjectId as `const ObjectId = require("mongodb").ObjectId`
@@ -92,7 +92,7 @@ app.post("/challenge", async (req, res) => {
         await client.connect();
 
         // Retrieve the challenges collection data
-        const col = client.db("ArnoStephanSacha").collection("challenges");
+        const col = client.db("dataBASED").collection("challenges");
 
         // Validation for double challenges
         // const chal = await col.findOne({ name: req.body.name, points: req.body.points, session: req.body.session, course: req.body.course });
@@ -130,7 +130,7 @@ app.put("/challenges/:id", async (req, res) => {
         await client.connect();
 
         // Retrieve the challenges collection data
-        const col = client.db("ArnoStephanSacha").collection("challenges");
+        const col = client.db("dataBASED").collection("challenges");
 
         // Create a query for a challenge to update
         const query = { _id: ObjectId(req.query.id) };
@@ -171,7 +171,7 @@ app.delete("/challenges/:id", async (req, res) => {
         await client.connect();
 
         // Retrieve the challenges collection data
-        const col = client.db("ArnoStephanSacha").collection("challenges");
+        const col = client.db("dataBASED").collection("challenges");
 
         // Create a query for a challenge to delete
         const query = { _id: ObjectId(req.query.id) };
