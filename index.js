@@ -6,7 +6,7 @@ const ObjectId = require("mongodb").ObjectId;
 const path = require("path");
 require("dotenv").config({ path: path.resolve(".env") });
 
-const client = new MongoClient(process.env.FINAL_URL);
+const client = new MongoClient(process.env.MONGO_URL);
 
 const app = express();
 const port = process.env.PORT;
