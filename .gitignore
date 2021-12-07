@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,node,macos,windows
@@ -32,6 +33,8 @@ Temporary Items
 .apdisk
 
 ### Node ###
+=======
+>>>>>>> 62c93bc87af15714e244ee7e4ac3ecb13f5cbfbd
 # Logs
 logs
 *.log
@@ -149,6 +152,7 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
+<<<<<<< HEAD
 .pnp.*
 
 ### Node Patch ###
@@ -207,3 +211,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,macos,windows
+=======
+.pnp.*
+>>>>>>> 62c93bc87af15714e244ee7e4ac3ecb13f5cbfbd
