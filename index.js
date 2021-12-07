@@ -61,7 +61,7 @@ app.get("/challenge/:id", async (req, res) => {
 
         // Force the req.query.id into an ObjectId otherwise you won't be able to log anything.
         // Important: Make sure to import ObjectId as `const ObjectId = require("mongodb").ObjectId`
-        const query = { _id: ObjectId(req.query.id) };
+        const query = { _id: ObjectId(req.params.id) };
         const chal = await col.findOne(query);
 
         if (chal) {
@@ -69,7 +69,7 @@ app.get("/challenge/:id", async (req, res) => {
             res.status(200).send(chal);
             return;
         } else {
-            res.status(400).send(`Challenge with id \"${req.query.id}\" could not be found`);
+            res.status(400).send(`Challenge with id \"${req.params.id}\" could not be found`);
         }
     } catch (error) {
         console.log(error);
