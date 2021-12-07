@@ -59,6 +59,7 @@ app.get("/challenge/:id", async (req, res) => {
         // Retrieve the challenges collection data
         const col = client.db("dataBASED").collection("challenges");
 
+        const ObjectId = require("mongodb").ObjectId
         // Force the req.query.id into an ObjectId otherwise you won't be able to log anything.
         // Important: Make sure to import ObjectId as `const ObjectId = require("mongodb").ObjectId`
         const query = { _id: ObjectId(req.query.id) };
